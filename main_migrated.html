@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hepsiburada - Final Proje: Güvenli Teslimat Dönüşümü</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* --- TEMEL AYARLAR --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            /* Slate 900 */
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Sayfa genelinde taşmayı gizle */
+        }
+
+        /* --- KAYDIRMA ÇUBUĞUNU GİZLEME (SCROLLBAR REMOVAL) --- */
+        #slide-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            /* scroll-snap-type removed */
+            /* Slaytların tam oturmasını sağlar */
+            scroll-behavior: smooth;
+            /* Firefox için scrollbar gizleme */
+            scrollbar-width: none;
+            /* IE ve Edge için scrollbar gizleme */
+            -ms-overflow-style: none;
+        }
+
+        /* Chrome, Safari ve Opera için scrollbar gizleme */
+        #slide-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            /* scroll-snap removed */
+            /* Hızlı kaydırmada aradaki slaytları atlamayı zorlaştır */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.scrollable-content {
+            justify-content: flex-start;
+            padding-top: 6rem;
+            overflow-y: auto;
+            /* İçerik kaydırma çubuğunu da gizle */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .slide.scrollable-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide-content {
+            width: 100%;
+            max-width: 1280px;
+            z-index: 10;
+            padding-bottom: 4rem;
+        }
+
+        /* --- GÖRSEL EFEKTLER --- */
+        .glow-bg {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            z-index: 0;
+            animation: pulse 10s infinite alternate;
+        }
+
+        .glow-orange {
+            background: #FF6000;
+            top: -10%;
+            left: -10%;
+        }
+
+        .glow-purple {
+            background: #8B5CF6;
+            bottom: -10%;
+            right: -10%;
+            animation-delay: 2s;
+        }
+
+        .glow-blue {
+            background: #3B82F6;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+            width: 400px;
+            height: 400px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+
+            100% {
+                transform: scale(1.2);
+                opacity: 0.2;
+            }
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 96, 0, 0.4);
+            box-shadow: 0 12px 40px 0 rgba(255, 96, 0, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #FF6000, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-text-blue {
+            background: linear-gradient(to right, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- ÖZEL BİLEŞENLER --- */
+        .circle-3m {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 4px solid;
+            background: rgba(15, 23, 42, 0.9);
+            transition: transform 0.3s;
+        }
+
+        .ebo-vertical-card {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .ebo-vertical-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .matrix-cell {
+            padding: 1.5rem;
+            border-radius: 1rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .raci-table th {
+            background: linear-gradient(to right, rgba(255, 96, 0, 0.15), rgba(255, 96, 0, 0.05));
+            color: #FF6000;
+            padding: 1.25rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            border-bottom: 2px solid rgba(255, 96, 0, 0.2);
+        }
+
+        .raci-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 50%;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .role-r {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .role-a {
+            background: #F59E0B;
+            color: black;
+            border: 2px solid #FFF;
+        }
+
+        .role-c {
+            background: #8B5CF6;
+            color: white;
+        }
+
+        .role-i {
+            background: #6B7280;
+            color: white;
+        }
+
+        .role-s {
+            background: #10B981;
+            color: white;
+        }
+
+        /* --- KANO ÖZEL TASARIM --- */
+        .kano-card {
+            border-left-width: 6px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .kano-card:hover {
+            transform: scale(1.02) translateX(10px);
+        }
+
+        nav {
+            backdrop-filter: blur(10px);
+            background-color: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 450px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-placeholder:hover {
+            border-color: #FF6000;
+            background: rgba(255, 96, 0, 0.05);
+            color: #FF6000;
+        }
+
+        /* --- PERSONA & EMPATİ --- */
+        .empathy-grid-modern {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .empathy-item {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .empathy-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .empathy-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .empathy-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FF6000", // Hepsiburada Orange
+                        secondary: "#1E3A8A", // Deep Blue for headers
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#111827",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1F2937",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+
+<body>
+    <!-- Background Glow Effects -->
+    <div class="glow-bg glow-orange"></div>
+    <div class="glow-bg glow-purple"></div>
+    <div class="glow-bg glow-blue"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-white text-xl font-bold tracking-tight">Hepsiburada</span>
+                    <span class="text-[#FF6000] text-xl font-bold ml-1">BPA</span>
+                </div>
+                <div
+                    class="hidden md:flex space-x-4 text-[10px] font-medium text-gray-300 overflow-x-auto no-scrollbar">
+                    <a href="#giris" class="hover:text-[#FF6000] transition whitespace-nowrap">Özet</a>
+                    <a href="#ekip" class="hover:text-[#FF6000] transition whitespace-nowrap">Ekip</a>
+                    <a href="#3m-ebo" class="hover:text-[#FF6000] transition whitespace-nowrap">3M/EBO</a>
+                    <a href="#tobe" class="hover:text-[#FF6000] transition whitespace-nowrap">TO-BE</a>
+                    <a href="#paydas" class="hover:text-[#FF6000] transition whitespace-nowrap">Paydaşlar</a>
+                    <a href="#raci" class="hover:text-[#FF6000] transition whitespace-nowrap">RACI</a>
+                    <a href="#persona" class="hover:text-[#FF6000] transition whitespace-nowrap">Persona</a>
+                    <a href="#hmw" class="hover:text-[#FF6000] transition whitespace-nowrap">HMW</a>
+                    <a href="#piramit" class="hover:text-[#FF6000] transition whitespace-nowrap">Piramit</a>
+                    <a href="#gereksinimler" class="hover:text-[#FF6000] transition whitespace-nowrap">Gereksinim</a>
+                    <a href="#kano-modeli" class="hover:text-[#FF6000] transition whitespace-nowrap">KANO</a>
+                    <a href="#user-stories" class="hover:text-[#FF6000] transition whitespace-nowrap">Hikayeler</a>
+                    <a href="#acceptance-criteria"
+                        class="hover:text-[#FF6000] transition whitespace-nowrap">Kriterler</a>
+                    <a href="#use-case" class="hover:text-[#FF6000] transition whitespace-nowrap">UML</a>
+                    <a href="#wireframes" class="hover:text-[#FF6000] transition whitespace-nowrap">Wireframe</a>
+                    <a href="#storyboard" class="hover:text-[#FF6000] transition whitespace-nowrap">Storyboard</a>
+                    <a href="#user-mapping" class="hover:text-[#FF6000] transition whitespace-nowrap">Harita</a>
+                    <a href="#qrcode" class="hover:text-[#FF6000] transition whitespace-nowrap">QR</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Slide Container -->
+    <main id="slide-container">
+        <!-- 01_summary.html -->
+        <section id="giris" class="slide">
+            <div class="slide-content text-center">
+                <div
+                    class="inline-block px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold tracking-widest uppercase mb-6">
+                    Final Projesi • Yönetim Özeti
+                </div>
+                <h1 class="text-6xl md:text-8xl font-black text-white mb-6 tracking-tight">
+                    <span class="gradient-text">Hepsiburada</span>
+                </h1>
+                <h2 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
+                    <span class="gradient-text">Güvenli Teslimat Dönüşümü</span>
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 text-left">
+                    <div class="glass-card p-8 border-t-4 border-red-500">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-3">🚨</span>
+                            <h3 class="text-xl font-bold text-white">Problem</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            <strong>"Teslim Edildi Paradoksu":</strong> Kurye teslim ettiğini, müşteri almadığını iddia
+                            ediyor.
+                            Sonuç: Güven kaybı ve yüksek iade maliyeti.
+                        </p>
+                    </div>
+                    <div class="glass-card p-8 border-t-4 border-blue-500">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-3">🎯</span>
+                            <h3 class="text-xl font-bold text-white">İş Hedefi</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Güven kaynaklı müşteri kaybını (Churn) <strong>%20 azaltmak</strong> ve iade operasyonel
+                            giderlerini
+                            minimize etmek.
+                        </p>
+                    </div>
+                    <div class="glass-card p-8 border-t-4 border-green-500">
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-3">✅</span>
+                            <h3 class="text-xl font-bold text-white">Çözüm</h3>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            <strong>"Güvenli Kod":</strong> Teslimatın kontrolünü müşteriye veren, kod tabanlı çift
+                            faktörlü
+                            doğrulama sistemi (MVP).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 01_5_team.html -->
+        <section id="ekip" class="slide">
+            <div class="slide-content text-center">
+                <h2 class="text-4xl font-bold text-white mb-12">Proje Ekibi: <span class="gradient-text">F4NTASTİK
+                        4</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Ahmet Yıldırım -->
+                    <div class="glass-card p-6 flex flex-col items-center group">
+                        <div
+                            class="w-40 h-40 rounded-full mb-6 overflow-hidden border-4 border-orange-500/20 group-hover:border-orange-500 transition-colors duration-300">
+                            <img src="legacy_assets/ekip_fotosu/ahmet-yildirim.jpg" alt="Ahmet Yıldırım"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Ahmet Yıldırım</h3>
+                    </div>
+
+                    <!-- İrem Tunç -->
+                    <div class="glass-card p-6 flex flex-col items-center group">
+                        <div
+                            class="w-40 h-40 rounded-full mb-6 overflow-hidden border-4 border-orange-500/20 group-hover:border-orange-500 transition-colors duration-300">
+                            <img src="legacy_assets/ekip_fotosu/irem-tunc.jpg" alt="İrem Tunç"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">İrem Tunç</h3>
+                    </div>
+
+                    <!-- Tunahan Şahin -->
+                    <div class="glass-card p-6 flex flex-col items-center group">
+                        <div
+                            class="w-40 h-40 rounded-full mb-6 overflow-hidden border-4 border-orange-500/20 group-hover:border-orange-500 transition-colors duration-300">
+                            <img src="legacy_assets/ekip_fotosu/tunahan-sahin.jpg" alt="Tunahan Şahin"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Tunahan Şahin</h3>
+                    </div>
+
+                    <!-- Ebutuğrab Kızmaz -->
+                    <div class="glass-card p-6 flex flex-col items-center group">
+                        <div
+                            class="w-40 h-40 rounded-full mb-6 overflow-hidden border-4 border-orange-500/20 group-hover:border-orange-500 transition-colors duration-300">
+                            <img src="legacy_assets/ekip_fotosu/ebutugrab-kizmaz.jpg" alt="Ebutuğrab Kızmaz"
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">Ebutuğrab Kızmaz</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02_3m_ebo.html -->
+        <section id="3m-ebo" class="slide scrollable-content">
+            <div class="slide-content">
+                <h2 class="text-4xl font-bold text-white mb-4 text-center">Yalın Süreç Analizi: <span
+                        class="gradient-text">3M &
+                        EBO</span></h2>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-6 mb-12">
+                    <div class="glass-card p-4 w-full md:w-1/4 text-center border-b-2 border-blue-500">
+                        <div class="circle-3m border-blue-500 text-blue-400 mx-auto mb-3">MURA</div>
+                        <h4 class="text-white font-bold text-sm">Düzensizlik</h4>
+                    </div>
+                    <div class="glass-card p-4 w-full md:w-1/4 text-center border-b-2 border-orange-500">
+                        <div class="circle-3m border-orange-500 text-orange-400 mx-auto mb-3">MURI</div>
+                        <h4 class="text-white font-bold text-sm">Aşırı Yük</h4>
+                    </div>
+                    <div class="glass-card p-4 w-full md:w-1/4 text-center border-b-2 border-red-500">
+                        <div class="circle-3m border-red-500 text-red-400 mx-auto mb-3">MUDA</div>
+                        <h4 class="text-white font-bold text-sm">İsraf</h4>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-bold text-white mb-6 pl-2 border-l-4 border-[#FF6000]">E.B.O. Dönüşüm
+                    Stratejisi</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="ebo-vertical-card border-t-4 border-red-500">
+                        <div class="flex items-center mb-4"><span
+                                class="p-2 bg-red-500/20 rounded-lg text-red-400 mr-3">✂️</span>
+                            <h4 class="text-xl font-black text-white">ELİMİNE ET</h4>
+                        </div>
+                        <div class="space-y-4 flex-grow">
+                            <div>
+                                <p class="text-xs font-bold text-red-400 uppercase tracking-widest mb-1">Mevcut İsraf
+                                    (Bekleme)
+                                </p>
+                                <p class="text-sm text-gray-300">Kuryenin kapıda tereddüdü ve manuel teyit için harcanan
+                                    zaman
+                                    kaybı.</p>
+                            </div>
+                            <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+                                <p class="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">Dönüşüm</p>
+                                <p class="text-sm text-white font-medium">Telefonla teyit ve manuel sorgulama
+                                    süreçlerini
+                                    tamamen kaldırıyoruz.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ebo-vertical-card border-t-4 border-purple-500">
+                        <div class="flex items-center mb-4"><span
+                                class="p-2 bg-purple-500/20 rounded-lg text-purple-400 mr-3">🔗</span>
+                            <h4 class="text-xl font-black text-white">BİRLEŞTİR</h4>
+                        </div>
+                        <div class="space-y-4 flex-grow">
+                            <div>
+                                <p class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1">Mevcut İsraf
+                                    (Aşırı
+                                    İşlem)</p>
+                                <p class="text-sm text-gray-300">İmza, fotoğraf ve sözlü teyit gibi kopuk çoklu
+                                    doğrulama
+                                    adımları.</p>
+                            </div>
+                            <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+                                <p class="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">Dönüşüm</p>
+                                <p class="text-sm text-white font-medium">Teslimat onayı ve güvenlik teyidini tek bir
+                                    dijital
+                                    kod ekranında birleştiriyoruz.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ebo-vertical-card border-t-4 border-blue-500">
+                        <div class="flex items-center mb-4"><span
+                                class="p-2 bg-blue-500/20 rounded-lg text-blue-400 mr-3">🤖</span>
+                            <h4 class="text-xl font-black text-white">OTOMATİZE ET</h4>
+                        </div>
+                        <div class="space-y-4 flex-grow">
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Mevcut İsraf
+                                    (Hatalar)
+                                </p>
+                                <p class="text-sm text-gray-300">Manuel veri girişi ve kötü niyetli istismarlar (beyan
+                                    farkı).
+                                </p>
+                            </div>
+                            <div class="p-3 bg-white/5 rounded-lg border border-white/10">
+                                <p class="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">Dönüşüm</p>
+                                <p class="text-sm text-white font-medium">Kod doğrulanmadığı sürece paketi "Teslim
+                                    Edildi"
+                                    yapmayan sistem kilidi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03_tobe.html -->
+        <section id="tobe" class="slide">
+            <div class="slide-content text-center flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-6">TO-BE (İdeal) Süreç <span class="gradient-text-blue">BPMN
+                        Tasarımı</span></h2>
+                <div class="glass-card p-4 mx-auto max-w-5xl">
+                    <!-- TO-BE Process Image -->
+                    <div class="flex justify-center items-center h-full">
+                        <img src="legacy_assets/tobe.png" alt="TO-BE Süreç Tasarımı"
+                            class="w-full h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04_stakeholders.html -->
+        <section id="paydas" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Stratejik Paydaş Yönetimi: <span
+                        class="gradient-text">Güç/İlgi Matrisi</span></h2>
+
+                <div class="flex justify-center items-center h-full pb-10">
+                    <img src="legacy_assets/matris.png" alt="Güç/İlgi Matrisi"
+                        class="w-full max-w-5xl h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                </div>
+            </div>
+        </section>
+
+        <!-- 06_raci.html -->
+        <section id="raci" class="slide scrollable-content">
+            <div class="slide-content">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Sorumluluk Atama Matrisi: <span
+                        class="gradient-text">RACI</span></h2>
+                <div class="glass-card p-0 overflow-hidden shadow-2xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full raci-table text-left border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/4">İş Paketi / Aktivite</th>
+                                    <th class="text-center">BT / Yazılım</th>
+                                    <th class="text-center">Proje Yön.</th>
+                                    <th class="text-center">Hepsijet Ops</th>
+                                    <th class="text-center">3. Parti Kargo</th>
+                                    <th class="text-center">Müşteri Hiz.</th>
+                                    <th class="text-center">Kurye</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300 text-sm">
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">Güvenli Kod API Geliştirme</td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center">-</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">3. Parti API Entegrasyonu</td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center">-</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">Kurye Mobil Uygulama Güncelleme</td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">Saha Eğitimi ve Pilot Uygulama</td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">Müşteri Bilgilendirme ve İletişim
+                                    </td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="px-4 py-4 font-semibold text-white">Süreç İzleme ve Şikayet Yönetimi</td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center"><span class="role-badge role-c">C</span></td>
+                                    <td class="text-center"><span class="role-badge role-i">I</span></td>
+                                    <td class="text-center"><span class="role-badge role-r">R</span></td>
+                                    <td class="text-center"><span class="role-badge role-a">A</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-center gap-6 flex-wrap">
+                    <div class="flex items-center text-[10px] text-gray-400"><span
+                            class="role-badge role-r w-6 h-6 mr-2">R</span> <strong>Responsible:</strong> Yapan</div>
+                    <div class="flex items-center text-[10px] text-gray-400"><span
+                            class="role-badge role-a w-6 h-6 mr-2">A</span> <strong>Accountable:</strong> Onaylayan
+                    </div>
+                    <div class="flex items-center text-[10px] text-gray-400"><span
+                            class="role-badge role-c w-6 h-6 mr-2">C</span> <strong>Consulted:</strong> Danışılan</div>
+                    <div class="flex items-center text-[10px] text-gray-400"><span
+                            class="role-badge role-i w-6 h-6 mr-2">I</span> <strong>Informed:</strong> Bilgilendirilen
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05_persona.html -->
+        <section class="slide">
+            <div class="slide-content">
+                <!-- Header -->
+                <h2 class="text-4xl font-bold mb-8 text-center"><span class="gradient-text">Cumali Cingöz</span> <span
+                        class="text-2xl text-slate-400 block mt-2 font-normal">Plaza Çalışanı / İş Analisti (Beyaz
+                        Yaka)</span>
+                </h2>
+
+                <!-- Main Layout -->
+                <div style="display: grid; grid-template-columns: 1fr 340px 1fr; gap: 1rem; height: auto;">
+
+                    <!-- Left Column: Think & Feel / Say & Do -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Think & Feel -->
+                        <div class="glass-card p-4 flex-1 flex flex-col justify-center">
+                            <h3 class="empathy-label text-orange-400 border-b border-orange-500/30 pb-2 mb-4">
+                                <span class="empathy-bullet bg-orange-500"></span>
+                                Düşünüyor & Hissediyor
+                            </h3>
+                            <ul class="space-y-2 text-base text-slate-300">
+                                <li class="flex items-start"><span class="mr-2">•</span> Lojistik süreci hantal, dijital
+                                    teyit
+                                    sistemi yok.</li>
+                                <li class="flex items-start"><span class="mr-2">•</span> Pahalı ürünü kurye sağ salim
+                                    teslim
+                                    eder mi?</li>
+                                <li class="flex items-start"><span class="mr-2">•</span> Belirsizlikten kaygılı,
+                                    değersiz
+                                    hissediyor.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Say & Do -->
+                        <div class="glass-card p-4 flex-1 flex flex-col justify-center">
+                            <h3 class="empathy-label text-orange-400 border-b border-orange-500/30 pb-2 mb-4">
+                                <span class="empathy-bullet bg-orange-500"></span>
+                                Söylüyor & Yapıyor
+                            </h3>
+                            <ul class="space-y-2 text-base text-slate-300">
+                                <li class="flex items-start"><span class="mr-2">•</span> Müşteri hizmetleri için
+                                    bekleyemem,
+                                    toplantım var.</li>
+                                <li class="flex items-start"><span class="mr-2">•</span> Kuryeyi arıyorum, ulaşamıyorum.
+                                </li>
+                                <li class="flex items-start"><span class="mr-2">•</span> Sürekli kargo takibini (F5)
+                                    kontrol
+                                    ediyor.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Center Column: Profile -->
+                    <div
+                        class="glass-card p-4 flex flex-col items-center text-center relative overflow-hidden border-orange-500/30">
+                        <div class="glow-bg glow-orange" style="width: 200px; height: 200px; opacity: 0.3; top: 20px;">
+                        </div>
+
+                        <div
+                            class="w-78 h-78 rounded-full p-1 border-2 border-orange-500/50 mb-6 shadow-lg relative z-10 flex-shrink-0">
+                            <img src="legacy_assets/persona/Gemini_Generated_Image_ee0dtiee0dtiee0d.png"
+                                alt="Cumali Cingöz" class="w-full h-full rounded-full object-cover"
+                                style="object-position: 80% center;">
+                        </div>
+
+                        <div class="mb-6 relative z-10">
+                            <div class="text-orange-200 text-base italic font-medium mb-4 px-4">
+                                "ZAMANIM PARADAN DEĞERLİ, KARGOMUN BENİ GÜVENLE BULMASINI BEKLİYORUM."
+                            </div>
+                        </div>
+
+                        <div
+                            class="mt-auto w-full bg-orange-900/30 p-4 rounded-xl border border-orange-500/20 text-left">
+                            <span class="text-orange-400 text-xs font-bold uppercase block mb-1">En Büyük Sancı</span>
+                            <p class="text-sm text-slate-200">Teslim edildi mesajı alıp paketi bulamamak (Teslim Edildi
+                                Paradoksu).</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: See / Hear -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- See -->
+                        <div class="glass-card p-4 flex-1 flex flex-col justify-center">
+                            <h3 class="empathy-label text-blue-400 border-b border-blue-500/30 pb-2 mb-4">
+                                <span class="empathy-bullet bg-blue-500"></span>
+                                Görüyor
+                            </h3>
+                            <ul class="space-y-2 text-base text-slate-300">
+                                <li class="flex items-start"><span class="mr-2">•</span> Telefonda "Teslim Edildi"
+                                    yazıyor ama
+                                    paket yok.</li>
+                                <li class="flex items-start"><span class="mr-2">•</span> Rakiplerin "hızlı teslimat"
+                                    reklamları,
+                                    kendi belirsizliğiyle çelişiyor.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Hear -->
+                        <div class="glass-card p-4 flex-1 flex flex-col justify-center">
+                            <h3 class="empathy-label text-blue-400 border-b border-blue-500/30 pb-2 mb-4">
+                                <span class="empathy-bullet bg-blue-500"></span>
+                                Duyuyor
+                            </h3>
+                            <ul class="space-y-2 text-base text-slate-300 list-disc list-inside">
+                                <li><strong class="text-blue-300">Müşteri Hizmetleri:</strong> "Talebinizi aldık,
+                                    inceleme
+                                    başlattık."</li>
+                                <li><strong class="text-blue-300">Ofis Arkadaşları:</strong> "Dikkat et, benim kargom
+                                    kaybolmuştu."</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Pains & Gains -->
+                <div class="grid grid-cols-2 gap-6 mt-6">
+                    <!-- Pains -->
+                    <div class="glass-card p-4 flex items-center border-l-4 border-red-500">
+                        <div class="mr-6 text-red-500/20">
+                            <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-red-400 font-bold uppercase text-sm mb-2">Sancılar</h3>
+                            <ul class="text-sm text-slate-300 space-y-1">
+                                <li><strong>Belirsizlik:</strong> Teslim detayları net değil.</li>
+                                <li><strong>Zaman Kaybı:</strong> Hatalı teslimat ve verimsiz görüşmeler.</li>
+                                <li><strong>Güven Kaybı:</strong> "Hızlı Teslimat" vaadi ile "Kayıp Paket" gerçeği.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Gains -->
+                    <div class="glass-card p-4 flex items-center border-l-4 border-green-500 relative overflow-hidden">
+                        <div class="absolute right-0 bottom-0 text-green-500/10">
+                            <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-green-400 font-bold uppercase text-sm mb-2">Kazanımlar</h3>
+                            <ul class="text-sm text-slate-300 space-y-1 relative z-10">
+                                <li><strong>Kontrol Gücü:</strong> Kendi onayıyla teslimat.</li>
+                                <li><strong>Hız ve Güven:</strong> Risksiz teslimat sistemi.</li>
+                                <li><strong>Şeffaflık:</strong> Kanıtlanabilir, uçtan uca takip.</li>
+                                <li><strong>Onaylı Dijital Kanıt:</strong> Zaman ve konum damgalı teslimat.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 07_hmw.html -->
+        <section id="hmw" class="slide scrollable-content">
+            <div class="glow-bg glow-orange" style="right: 0; left: auto; top: 20%;"></div>
+
+            <div class="slide-content">
+                <!-- Başlık Alanı -->
+                <div class="text-center mb-12">
+                    <div
+                        class="inline-block px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold tracking-widest uppercase mb-4">
+                        Tasarım Odaklı Düşünce
+                    </div>
+                    <h2 class="text-5xl font-black italic text-white">HMW: <span class="gradient-text">Nasıl
+                            Yapabiliriz?</span>
+                    </h2>
+                    <p class="text-slate-400 mt-4 max-w-2xl mx-auto">
+                        Cumali Cingöz’ün Sancılarını Fırsata Dönüştürmek için İnovatif Fikirler (3M & EBO Odaklı)
+                    </p>
+                </div>
+
+                <!-- Ana Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <!-- Card 1: Şeffaflık -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Header Card -->
+                        <div class="glass-card p-6 border-t-2 border-t-blue-500 relative group overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i class="fas fa-search-plus text-6xl text-blue-500"></i>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-blue-400 font-bold text-xs uppercase tracking-wider mb-1">Odak Alanı 1
+                                </h3>
+                                <h4 class="text-white font-bold text-lg leading-tight">TESLİMAT ŞEFFAFLIĞI & GÜVEN</h4>
+                                <span class="text-slate-500 text-xs italic mt-2 block">(Odak: Cumali Cingöz)</span>
+                            </div>
+                        </div>
+
+                        <!-- Problem/Question -->
+                        <div class="glass-card p-6 border-l-4 border-l-blue-500 bg-blue-500/5">
+                            <h5 class="text-blue-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <i class="fas fa-question-circle"></i> SORU 1
+                            </h5>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                Paketin fiziksel olarak Cumali'nin eline geçmeden 'Teslim Edildi' statüsüne dönmesini
+                                <span class="text-white font-semibold">nasıl tamamen ortadan kaldırabiliriz ki</span>,
+                                yanlış
+                                bildirim kaynaklı kaygıyı sıfırlayalım?
+                            </p>
+                        </div>
+
+                        <!-- Solutions -->
+                        <div class="glass-card p-6 flex-grow flex flex-col">
+                            <div class="mb-4 pb-2 border-b border-white/10">
+                                <h5 class="text-white font-bold text-xs uppercase tracking-wider text-center">Potansiyel
+                                    Çözümler</h5>
+                                <p class="text-slate-500 text-[10px] text-center mt-1">(EBO: Eliminate & Behavior
+                                    Change)</p>
+                            </div>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li class="flex gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span><strong class="text-blue-400">Çift Taraflı Dijital Onay:</strong> 6 haneli kod
+                                        olmadan
+                                        işlem kapanmaz.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span><strong class="text-blue-400">Yakınlık Sensörü:</strong> GPS/Bluetooth ile
+                                        adreste
+                                        onay.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-blue-500 mt-1">•</span>
+                                    <span><strong class="text-blue-400">Blockchain Kanıtı:</strong> Güvenilir teslimat
+                                        kaydı.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Verimlilik -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Header Card -->
+                        <div class="glass-card p-6 border-t-2 border-t-orange-500 relative group overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i class="fas fa-robot text-6xl text-orange-500"></i>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-orange-400 font-bold text-xs uppercase tracking-wider mb-1">Odak Alanı 2
+                                </h3>
+                                <h4 class="text-white font-bold text-lg leading-tight">KURYE VERİMLİLİĞİ & İŞ YÜKÜ</h4>
+                                <span class="text-slate-500 text-xs italic mt-2 block">(Odak: Mura & Muri)</span>
+                            </div>
+                        </div>
+
+                        <!-- Problem/Question -->
+                        <div class="glass-card p-6 border-l-4 border-l-orange-500 bg-orange-500/5">
+                            <h5 class="text-orange-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <i class="fas fa-question-circle"></i> SORU 2
+                            </h5>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                Kampanya dönemlerindeki ani talep artışlarında kuryelerin aşırı yüklenmesini <span
+                                    class="text-white font-semibold">nasıl önleyebiliriz ki</span>, teslimat kalitesi ve
+                                çalışan
+                                memnuniyeti düşmesin?
+                            </p>
+                        </div>
+
+                        <!-- Solutions -->
+                        <div class="glass-card p-6 flex-grow flex flex-col">
+                            <div class="mb-4 pb-2 border-b border-white/10">
+                                <h5 class="text-white font-bold text-xs uppercase tracking-wider text-center">Potansiyel
+                                    Çözümler</h5>
+                                <p class="text-slate-500 text-[10px] text-center mt-1">(EBO: Automate & Optimize)</p>
+                            </div>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li class="flex gap-2">
+                                    <span class="text-orange-500 mt-1">•</span>
+                                    <span><strong class="text-orange-400">AI Dinamik Rotalama:</strong> Anlık yüke göre
+                                        optimizasyon.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-orange-500 mt-1">•</span>
+                                    <span><strong class="text-orange-400">Tahmini Planlama:</strong> Veri analiziyle
+                                        önleyici
+                                        ekip.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-orange-500 mt-1">•</span>
+                                    <span><strong class="text-orange-400">Akıllı Nokta Teşviki:</strong> Locker
+                                        kullanımı.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: İletişim -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Header Card -->
+                        <div class="glass-card p-6 border-t-2 border-t-purple-500 relative group overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i class="fas fa-comments text-6xl text-purple-500"></i>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-purple-400 font-bold text-xs uppercase tracking-wider mb-1">Odak Alanı 3
+                                </h3>
+                                <h4 class="text-white font-bold text-lg leading-tight">MÜŞTERİ-KURYE İLETİŞİMİ</h4>
+                                <span class="text-slate-500 text-xs italic mt-2 block">(Odak: Anlık Sorunlar)</span>
+                            </div>
+                        </div>
+
+                        <!-- Problem/Question -->
+                        <div class="glass-card p-6 border-l-4 border-l-purple-500 bg-purple-500/5">
+                            <h5 class="text-purple-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <i class="fas fa-question-circle"></i> SORU 3
+                            </h5>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                Kurye ve müşteri arasındaki anlık iletişimi <span class="text-white font-semibold">nasıl
+                                    kolaylaştırabiliriz ki</span>, teslimat sırasındaki belirsizlikler hızla çözülsün?
+                            </p>
+                        </div>
+
+                        <!-- Solutions -->
+                        <div class="glass-card p-6 flex-grow flex flex-col">
+                            <div class="mb-4 pb-2 border-b border-white/10">
+                                <h5 class="text-white font-bold text-xs uppercase tracking-wider text-center">Potansiyel
+                                    Çözümler</h5>
+                                <p class="text-slate-500 text-[10px] text-center mt-1">(EBO: Optimize & Behavior Change)
+                                </p>
+                            </div>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li class="flex gap-2">
+                                    <span class="text-purple-500 mt-1">•</span>
+                                    <span><strong class="text-purple-400">Uygulama İçi Arama:</strong> Gizli numara ile
+                                        güvenli
+                                        iletişim.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-purple-500 mt-1">•</span>
+                                    <span><strong class="text-purple-400">Canlı Konum & ETA:</strong> Gerçek zamanlı
+                                        şeffaflık.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-purple-500 mt-1">•</span>
+                                    <span><strong class="text-purple-400">Dijital Tercihler:</strong> "Zili çalma" gibi
+                                        notlar.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Deneyim -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Header Card -->
+                        <div class="glass-card p-6 border-t-2 border-t-emerald-500 relative group overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i class="fas fa-box-open text-6xl text-emerald-500"></i>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Odak Alanı
+                                    4</h3>
+                                <h4 class="text-white font-bold text-lg leading-tight">TESLİMAT SONRASI DENEYİM</h4>
+                                <span class="text-slate-500 text-xs italic mt-2 block">(Odak: Memnuniyet)</span>
+                            </div>
+                        </div>
+
+                        <!-- Problem/Question -->
+                        <div class="glass-card p-6 border-l-4 border-l-emerald-500 bg-emerald-500/5">
+                            <h5 class="text-emerald-400 font-bold text-sm mb-3 flex items-center gap-2">
+                                <i class="fas fa-question-circle"></i> SORU 4
+                            </h5>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                Olası bir sorunda "muhatap bulamama" kaygısını <span
+                                    class="text-white font-semibold">nasıl
+                                    giderebiliriz ki</span>, süreçten memnun ayrılsın ve sadakati artsın?
+                            </p>
+                        </div>
+
+                        <!-- Solutions -->
+                        <div class="glass-card p-6 flex-grow flex flex-col">
+                            <div class="mb-4 pb-2 border-b border-white/10">
+                                <h5 class="text-white font-bold text-xs uppercase tracking-wider text-center">Potansiyel
+                                    Çözümler</h5>
+                                <p class="text-slate-500 text-[10px] text-center mt-1">(EBO: Automate & Optimize)</p>
+                            </div>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li class="flex gap-2">
+                                    <span class="text-emerald-500 mt-1">•</span>
+                                    <span><strong class="text-emerald-400">AI Çözüm Asistanı:</strong> Anında proaktif
+                                        destek.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-emerald-500 mt-1">•</span>
+                                    <span><strong class="text-emerald-400">Tek Tıkla İade:</strong> Kolay erişilebilir
+                                        süreç.</span>
+                                </li>
+                                <li class="flex gap-2">
+                                    <span class="text-emerald-500 mt-1">•</span>
+                                    <span><strong class="text-emerald-400">Geri Bildirim Ödülü:</strong> Deneyimi puana
+                                        dönüştürme.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Alt Not -->
+                <div class="mt-8 text-center opacity-50">
+                    <p class="text-xs italic">"How Might We" yöntemiyle kullanıcı sorunlarını inovasyon fırsatlarına
+                        dönüştürüyoruz.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 08_pyramid.html -->
+        <section id="piramit" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full items-center">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Gereksinim Piramidi</h2>
+                <p class="text-center text-gray-400 mb-8 max-w-3xl mx-auto text-sm italic">
+                    İş hedefleri, kullanıcı ihtiyaçları ve teknik altyapı arasındaki hiyerarşik bağı gösteren modelleme.
+                </p>
+
+                <div class="glass-card p-6 mx-auto w-full max-w-5xl">
+                    <!-- Bu alan piramit görseli eklemek için ayrılmıştır -->
+                    <!-- Piramit Görseli -->
+                    <div class="flex justify-center items-center h-full">
+                        <img src="legacy_assets/piramit.jpeg" alt="Gereksinim Piramidi"
+                            class="w-full max-w-4xl max-h-[70vh] object-contain rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 glass-card bg-white/5 max-w-3xl mx-auto text-center border-dashed">
+                    <p class="text-sm text-gray-400 italic leading-relaxed">
+                        <strong class="text-white font-semibold">Katmanlar Arası İlişki:</strong> Teknik altyapı
+                        (Taban),
+                        projenin <strong>"nasıl"</strong> çalışacağını; Kullanıcı katmanı (Orta), <strong>"kimin
+                            için"</strong>
+                        değer yaratacağını; İş katmanı (Zirve) ise yatırımın <strong>"neden"</strong> yapıldığını temsil
+                        eder.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 09_requirements.html -->
+        <section id="gereksinimler" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Çözüm Gereksinimleri: <span
+                        class="gradient-text">Teknik Standartlar</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Fonksiyonel -->
+                    <div class="ebo-vertical-card border-t-4 border-purple-500">
+                        <div class="flex items-center mb-6">
+                            <span class="p-2 bg-purple-500/20 rounded-lg text-purple-400 mr-4">⚙️</span>
+                            <h4 class="text-xl font-black text-white">Fonksiyonel Gereksinimler</h4>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <p class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1">FR-01: Çift
+                                    Taraflı Güvenli Kod Doğrulama (Mutual Authentication)</p>
+                                <ul class="text-sm text-gray-300 list-disc list-inside space-y-1">
+                                    <li>Sistem "Müşteri Onay Kodu" ve "Kurye Kimlik Kodu" olmak üzere iki farklı 6
+                                        haneli kod üretir.</li>
+                                    <li>Teslimat statüsü, ancak her iki kod da merkez sunucuda birbiriyle eşleştiğinde
+                                        "Teslim Edildi" durumuna geçer.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <p class="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1">FR-02:
+                                    Akıllı Konum ve Zaman Mühürleme</p>
+                                <p class="text-sm text-gray-300">Başarılı kod girişinde anlık GPS ve ISO 8601 zaman
+                                    damgası işlenir. Kod paylaşımı başarısızsa, sadece onay ile "Konum Damgalı Fotoğraf"
+                                    moduna geçiş sağlanır.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Non-Fonksiyonel -->
+                    <div class="ebo-vertical-card border-t-4 border-pink-500">
+                        <div class="flex items-center mb-6">
+                            <span class="p-2 bg-pink-500/20 rounded-lg text-pink-400 mr-4">⚡</span>
+                            <h4 class="text-xl font-black text-white">Fonksiyonel Olmayan Gereksinimler</h4>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <p class="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">NFR-01: İşlem
+                                    Doğruluğu ve Veri Bütünlüğü (Accuracy)</p>
+                                <ul class="text-sm text-gray-300 list-disc list-inside space-y-1">
+                                    <li>Kod eşleştirme %100 doğrulukla çalışmalı, geçersiz kodlara izin verilmemelidir.
+                                    </li>
+                                    <li>Tüm kanıtlar (kod, GPS, zaman) değiştirilemez (immutable) şekilde
+                                        arşivlenmelidir.</li>
+                                </ul>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <p class="text-xs font-bold text-pink-400 uppercase tracking-widest mb-1">NFR-02: Sistem
+                                    Yanıt Hızı ve Kullanılabilirlik</p>
+                                <ul class="text-sm text-gray-300 list-disc list-inside space-y-1">
+                                    <li>Doğrulama isteği yoğun saatlerde dahi en geç 1.5 saniye içinde yanıtlanmalıdır.
+                                    </li>
+                                    <li>Sinyal gücü düşük alanlar (asansör, bodrum) için çevrimdışı (offline) doğrulama
+                                        desteği sunulmalıdır.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10_kano.html -->
+        <section id="kano-modeli" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-10 text-center">Stratejik Önceliklendirme: <span
+                        class="gradient-text">KANO Modeli</span></h2>
+
+                <div class="flex justify-center items-center h-full pb-10">
+                    <img src="legacy_assets/kano.png" alt="Kano Modeli"
+                        class="w-full max-w-5xl h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                </div>
+            </div>
+        </section>
+
+        <!-- 12_acceptance_criteria.html -->
+        <section id="acceptance-criteria" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Agile Ürün Yönetimi: <span
+                        class="gradient-text">Kabul Kriterleri (BDD)</span></h2>
+                <p class="text-center text-gray-400 mb-10 max-w-3xl mx-auto">
+                    Her hikayenin "Bitti" (Definition of Done) tanımını <strong>Gherkin</strong> formatında
+                    netleştirdik.
+                </p>
+
+                <div class="flex justify-center items-center h-full pb-10">
+                    <img src="legacy_assets/Screenshot 2025-12-27 at 20-53-08 Stitch - Projects.png"
+                        alt="Acceptance Criteria - BDD"
+                        class="w-full max-w-6xl h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                </div>
+            </div>
+        </section>
+
+        <!-- 13_use_case.html -->
+        <section id="use-case" class="slide scrollable-content">
+            <div class="slide-content text-center">
+                <h2 class="text-4xl font-bold text-white mb-6">Agile Ürün Yönetimi: <span class="gradient-text">UML Use
+                        Case
+                        Diyagramı</span></h2>
+                <p class="text-gray-400 mb-8 max-w-2xl mx-auto">
+                    Sistemin aktörleri ve kullanım durumlarını gösteren model.
+                </p>
+
+                <div class="glass-card p-8 inline-block max-w-4xl w-full">
+                    <div class="flex justify-center items-center h-full">
+                        <img src="legacy_assets/uml-usecase.jpeg" alt="UML Use Case Diyagramı"
+                            class="w-full h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                    </div>
+                    <p class="mt-4 text-sm text-gray-400 italic">Merkezi sistem, her iki tarafın etkileşimini güvenli
+                        bir
+                        şekilde yönetir.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 14_wireframes.html -->
+        <section id="wireframes" class="slide scrollable-content">
+            <div class="slide-content">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Prototipleme: <span class="gradient-text">
+                        Wireframe Tasarımı</span></h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center max-w-6xl mx-auto">
+                    <!-- Screen 2: Packages -->
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="bg-gray-800 border-4 border-gray-700 rounded-3xl p-2 w-[220px] h-[460px] relative shadow-2xl">
+                            <div
+                                class="absolute top-4 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-black rounded-full z-20">
+                            </div>
+                            <div class="bg-white h-full rounded-2xl overflow-hidden relative pt-4">
+                                <img src="legacy_assets/uygulama/packages.png" alt="Paketlerim"
+                                    class="w-full h-full object-cover object-top">
+                            </div>
+                        </div>
+                        <h4 class="text-white mt-4 font-bold text-base">1. Paket Listesi</h4>
+                        <p class="text-gray-400 text-xs text-center px-2">Beklenen gönderilerin durumu.</p>
+                    </div>
+
+                    <!-- Screen 3: Process -->
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="bg-gray-800 border-4 border-gray-700 rounded-3xl p-2 w-[220px] h-[460px] relative shadow-2xl">
+                            <div
+                                class="absolute top-4 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-black rounded-full z-20">
+                            </div>
+                            <div class="bg-white h-full rounded-2xl overflow-hidden relative pt-4">
+                                <img src="legacy_assets/uygulama/delivery_process.png" alt="Teslimat Süreci"
+                                    class="w-full h-full object-cover object-top">
+                            </div>
+                        </div>
+                        <h4 class="text-white mt-4 font-bold text-base">2. Teslimat Süreci</h4>
+                        <p class="text-gray-400 text-xs text-center px-2">Teslimat sürecini izleme.</p>
+                    </div>
+
+                    <!-- Screen 4: Confirmation -->
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="bg-gray-800 border-4 border-gray-700 rounded-3xl p-2 w-[220px] h-[460px] relative shadow-2xl">
+                            <div
+                                class="absolute top-4 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-black rounded-full z-20">
+                            </div>
+                            <div class="bg-white h-full rounded-2xl overflow-hidden relative pt-4">
+                                <img src="legacy_assets/uygulama/delivery_confirmation.png" alt="Delivery Confirmation"
+                                    class="w-full h-full object-cover object-top">
+                            </div>
+                        </div>
+                        <h4 class="text-white mt-4 font-bold text-base">3. Teslimat Onayı</h4>
+                        <p class="text-gray-400 text-xs text-center px-2">Kod ile güvenli teslimat.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 15_storyboard.html -->
+        <!-- 15_storyboard.html - Part 1 -->
+        <section id="storyboard" class="slide">
+            <div class="slide-content text-center flex flex-col justify-start pt-24 h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Agile Ürün Yönetimi: <span
+                        class="gradient-text">Kullanıcı Hikayeleri</span></h2>
+                <div class="flex justify-center items-center h-[70vh]">
+                    <img src="legacy_assets/stories/Gemini_Generated_Image_sp12tusp12tusp12.png" alt="Hikaye 1"
+                        class="h-full w-auto object-contain rounded-xl shadow-2xl border border-white/10">
+                </div>
+            </div>
+        </section>
+
+        <!-- 15_storyboard.html - Part 2 -->
+        <section class="slide">
+            <div class="slide-content text-center flex flex-col justify-start pt-24 h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Agile Ürün Yönetimi: <span
+                        class="gradient-text">Kullanıcı Hikayeleri</span></h2>
+                <div class="flex justify-center items-center h-[70vh]">
+                    <img src="legacy_assets/stories/WhatsApp Image 2025-12-26 at 04.07.08 (1).jpeg" alt="Hikaye 2"
+                        class="h-full w-auto object-contain rounded-xl shadow-2xl border border-white/10">
+                </div>
+            </div>
+        </section>
+
+        <!-- 16_user_story_mapping.html -->
+        <section id="user-mapping" class="slide scrollable-content">
+            <div class="slide-content flex flex-col justify-center h-full">
+                <h2 class="text-4xl font-bold text-white mb-6 text-center">Planlama: <span class="gradient-text">User
+                        Story
+                        Mapping</span></h2>
+
+                <div class="flex justify-center items-center h-full p-4">
+                    <img src="legacy_assets/user_map/map.png" alt="User Story Mapping"
+                        class="w-full max-w-7xl h-auto rounded-xl shadow-2xl border border-white/10 hover:scale-[1.01] transition-transform duration-300">
+                </div>
+            </div>
+        </section>
+
+        <!-- 17_qrcode.html -->
+        <section id="qrcode" class="slide">
+            <div class="slide-content text-center flex flex-col justify-center items-center h-full">
+                <h2 class="text-4xl md:text-6xl font-bold text-white mb-8">Teşekkürler</h2>
+                <div
+                    class="glass-card p-12 bg-white/5 border border-white/10 flex flex-col items-center max-w-lg mx-auto transform hover:scale-105 transition duration-500">
+                    <div class="bg-white p-4 rounded-2xl mb-8 shadow-2xl relative overflow-hidden group">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-tr from-orange-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition duration-500">
+                        </div>
+                        <img src="legacy_assets/qrcode.png" alt="Proje QR Kodu"
+                            class="w-[300px] h-[300px] object-contain">
+                    </div>
+                    <h3 class="text-2xl text-white font-bold mb-3">Canlı demo için lütfen QR kodu okutunuz.</h3>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS Loader -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const slideContainer = document.getElementById('slide-container');
+            // Initialize Scroll and Keyboard Events after content is loaded
+            initializeEvents(slideContainer);
+        });
+
+        function initializeEvents(container) {
+            // Keyboard Navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                    e.preventDefault();
+                    container.scrollBy({
+                        top: window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                    e.preventDefault();
+                    container.scrollBy({
+                        top: -window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
